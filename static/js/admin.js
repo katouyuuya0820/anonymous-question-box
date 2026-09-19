@@ -1,10 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('loginForm');
+    const passwordInput = document.getElementById('passwordInput');
+    const controls = document.getElementById('controls');
     const startButton = document.getElementById('startButton');
     const endButton = document.getElementById('endButton');
     const status = document.getElementById('status');
 
     const socketUrl = `ws://${location.hostname}:8766`; // ページを開いたホスト(=サーバーPC)に自動接続
     let socket;
+    let authenticated = false;
 
     function setButtonsEnabled(enabled) {
         startButton.disabled = !enabled;
@@ -23,9 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         socket.onopen = () => {
             console.log('WebSocketサーバーに接続しました。');
-            status.textContent = 'サーバーに接続しました。';
+            status.textContent = 'サーバーに接続しました。パスワードを入力してください。';
             status.style.color = 'green';
-            setButtonsEnabled(true);
         };
 
         socket.onmessage = (event) => {
@@ -34,6 +37,21 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 data = JSON.parse(event.data);
             } catch (e) {
+                return;
+            }
+
+            if (data.type === 'ack' && data.action === 'auth') {
+                authenticated = data.ok;
+                if (authenticated) {
+                    loginForm.hidden = true;
+                    controls.hidden = false;
+                    setButtonsEnabled(true);
+                    status.textContent = 'ログインしました。';
+                    status.style.color = 'green';
+                } else {
+                    status.textContent = 'パスワードが違います。';
+                    status.style.color = 'red';
+                }
                 return;
             }
 
@@ -55,6 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('WebSocketサーバーから切断されました。');
             status.textContent = 'サーバーから切断されました。再接続試行中...';
             status.style.color = 'orange';
+            authenticated = false;
+            loginForm.hidden = false;
+            controls.hidden = true;
             setButtonsEnabled(false);
             setTimeout(connect, 5000);
         };
@@ -68,14 +89,23 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    loginForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const password = passwordInput.value;
+        passwordInput.value = '';
+        if (socket && socket.readyState === WebSocket.OPEN && password) {
+            socket.send(JSON.stringify({ type: 'auth', password }));
+        }
+    });
+
     startButton.addEventListener('click', () => {
-        if (socket && socket.readyState === WebSocket.OPEN) {
+        if (socket && socket.readyState === WebSocket.OPEN && authenticated) {
             socket.send(JSON.stringify({ type: 'start' }));
         }
     });
 
     endButton.addEventListener('click', () => {
-        if (socket && socket.readyState === WebSocket.OPEN) {
+        if (socket && socket.readyState === WebSocket.OPEN && authenticated) {
             socket.send(JSON.stringify({ type: 'end' }));
         }
     });

@@ -17,6 +17,7 @@ QUESTIONS_DIR = os.path.join(BASE_DIR, "Q")  # 質問を保存するフォルダ
 GENERAL_PORT = 8765  # 一般ユーザー用（質問投稿・結果表示）
 ADMIN_PORT = 8766    # 管理者用（質問開始・終了）
 STATIC_PORT = 8000   # HTML/JS/CSSを配信するHTTPサーバー用
+PASS = "changeme"    # 管理者ページのパスワード（必ず変更してください）
 
 # 表示に使う名前リスト（自由に編集してください）
 names = ["佐藤", "鈴木", "高橋", "田中", "伊藤", "渡辺", "山本", "中村", "小林", "加藤"]
@@ -42,7 +43,7 @@ def get_local_ip() -> str:
 
 def start_static_server():
     """index.html/admin.html等の静的ファイルをHTTPで配信する（別スレッドで実行）"""
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=BASE_DIR)
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=os.path.join(BASE_DIR, "static"))
     httpd = http.server.ThreadingHTTPServer(("0.0.0.0", STATIC_PORT), handler)
     httpd.serve_forever()
 
@@ -112,6 +113,7 @@ async def general_handler(websocket):
 async def admin_handler(websocket):
     """管理者（質問開始・終了）用ハンドラ"""
     logging.info(f"[管理者] クライアントが接続しました: {websocket.remote_address}")
+    authenticated = False
     try:
         async for message in websocket:
             try:
@@ -120,6 +122,22 @@ async def admin_handler(websocket):
                 continue
 
             action = data.get("type") if isinstance(data, dict) else None
+
+            if action == "auth":
+                authenticated = data.get("password") == PASS
+                await websocket.send(json.dumps(
+                    {"type": "ack", "action": "auth", "ok": authenticated}, ensure_ascii=False))
+                if authenticated:
+                    logging.info(f"[管理者] 認証に成功しました: {websocket.remote_address}")
+                else:
+                    logging.info(f"[管理者] 認証に失敗しました: {websocket.remote_address}")
+                continue
+
+            if not authenticated:
+                await websocket.send(json.dumps(
+                    {"type": "ack", "action": action, "ok": False, "message": "認証が必要です"},
+                    ensure_ascii=False))
+                continue
 
             if action == "start":
                 question = pick_random_question()
