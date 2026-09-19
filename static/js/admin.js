@@ -5,6 +5,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.getElementById('startButton');
     const endButton = document.getElementById('endButton');
     const status = document.getElementById('status');
+    const addNameForm = document.getElementById('addNameForm');
+    const nameInput = document.getElementById('nameInput');
+    const nameList = document.getElementById('nameList');
+    const namesToggle = document.getElementById('namesToggle');
+    const namesToggleIcon = document.getElementById('namesToggleIcon');
+    const namesBody = document.getElementById('namesBody');
+    const qrButton = document.getElementById('qrButton');
+    const qrOverlay = document.getElementById('qrOverlay');
+    const qrCode = document.getElementById('qrCode');
+    const qrUrl = document.getElementById('qrUrl');
+
+    let participantUrl = `${location.origin}/index.html`; // server_info受信までのフォールバック
+
+    qrButton.addEventListener('click', () => {
+        const qr = qrcode(0, 'M');
+        qr.addData(participantUrl);
+        qr.make();
+        qrCode.innerHTML = qr.createSvgTag({ scalable: true, margin: 2 });
+        qrUrl.textContent = participantUrl;
+        qrOverlay.hidden = false;
+    });
+
+    qrOverlay.addEventListener('click', () => {
+        qrOverlay.hidden = true;
+    });
+
+    namesToggle.addEventListener('click', () => {
+        const collapsed = namesBody.hidden;
+        namesBody.hidden = !collapsed;
+        namesToggle.setAttribute('aria-expanded', String(collapsed));
+        namesToggleIcon.textContent = collapsed ? '▾' : '▸';
+    });
 
     const socketUrl = `ws://${location.hostname}:8766`; // ページを開いたホスト(=サーバーPC)に自動接続
     let socket;
@@ -13,6 +45,27 @@ document.addEventListener('DOMContentLoaded', () => {
     function setButtonsEnabled(enabled) {
         startButton.disabled = !enabled;
         endButton.disabled = !enabled;
+    }
+
+    function renderNames(names) {
+        nameList.innerHTML = '';
+        names.forEach((name) => {
+            const li = document.createElement('li');
+            const span = document.createElement('span');
+            span.textContent = name;
+            const delButton = document.createElement('button');
+            delButton.type = 'button';
+            delButton.className = 'secondary';
+            delButton.textContent = '削除';
+            delButton.addEventListener('click', () => {
+                if (socket && socket.readyState === WebSocket.OPEN && authenticated) {
+                    socket.send(JSON.stringify({ type: 'remove_name', name }));
+                }
+            });
+            li.appendChild(span);
+            li.appendChild(delButton);
+            nameList.appendChild(li);
+        });
     }
 
     function connect() {
@@ -37,6 +90,30 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 data = JSON.parse(event.data);
             } catch (e) {
+                return;
+            }
+
+            if (data.type === 'names') {
+                renderNames(data.names || []);
+                return;
+            }
+
+            if (data.type === 'server_info') {
+                if (data.url) {
+                    participantUrl = data.url;
+                }
+                return;
+            }
+
+            if (data.type === 'auth_status') {
+                if (!data.required) {
+                    authenticated = true;
+                    loginForm.hidden = true;
+                    controls.hidden = false;
+                    setButtonsEnabled(true);
+                    status.textContent = '認証不要のため自動的にログインしました。';
+                    status.style.color = 'green';
+                }
                 return;
             }
 
@@ -95,6 +172,15 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordInput.value = '';
         if (socket && socket.readyState === WebSocket.OPEN && password) {
             socket.send(JSON.stringify({ type: 'auth', password }));
+        }
+    });
+
+    addNameForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = nameInput.value.trim();
+        nameInput.value = '';
+        if (socket && socket.readyState === WebSocket.OPEN && authenticated && name) {
+            socket.send(JSON.stringify({ type: 'add_name', name }));
         }
     });
 

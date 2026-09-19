@@ -13,12 +13,34 @@
             <input id="passwordInput" type="password" placeholder="パスワード" required>
             <button type="submit">ログイン</button>
         </form>
-        <div class="admin-buttons" id="controls" hidden>
-            <button id="startButton" type="button">質問開始</button>
-            <button id="endButton" type="button" class="secondary">終了</button>
+        <div id="controls" hidden>
+            <div class="admin-buttons">
+                <button id="startButton" type="button">質問開始</button>
+                <button id="endButton" type="button" class="secondary">終了</button>
+            </div>
+            <button id="qrButton" type="button">参加用QRコードを表示</button>
+            <div class="names-section">
+                <button id="namesToggle" type="button" class="section-toggle" aria-expanded="false">
+                    <span>参加者リスト</span>
+                    <span id="namesToggleIcon" class="toggle-icon">▸</span>
+                </button>
+                <div id="namesBody" hidden>
+                    <form id="addNameForm">
+                        <input id="nameInput" type="text" placeholder="名前を追加" required>
+                        <button type="submit">追加</button>
+                    </form>
+                    <ul id="nameList"></ul>
+                </div>
+            </div>
         </div>
         <p id="status"></p>
     </div>
+    <div id="qrOverlay" hidden>
+        <div id="qrCode"></div>
+        <p id="qrUrl"></p>
+        <p class="qr-hint">タップで閉じる</p>
+    </div>
+    <script src="js/qrcode.min.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>

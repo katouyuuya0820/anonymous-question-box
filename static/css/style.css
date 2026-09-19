@@ -106,6 +106,26 @@ button:disabled {
     color: #333;
 }
 
+[hidden] {
+    display: none !important;
+}
+
+#loginForm input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dcdce1;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+#loginForm input:focus {
+    outline: none;
+    border-color: #007aff;
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+}
+
 .admin-buttons {
     display: flex;
     gap: 10px;
@@ -115,10 +135,135 @@ button:disabled {
     margin-bottom: 0;
 }
 
+#qrButton {
+    margin-top: 12px;
+}
+
+#qrOverlay {
+    position: fixed;
+    inset: 0;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+#qrCode {
+    width: min(80vw, 80vh);
+    height: min(80vw, 80vh);
+}
+
+#qrCode svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#qrUrl {
+    margin: 0;
+    font-size: 16px;
+    color: #1c1c1e;
+    word-break: break-all;
+    text-align: center;
+}
+
+.qr-hint {
+    margin: 0;
+    font-size: 14px;
+    color: #6c6c70;
+}
+
 button.secondary {
     background-color: #ff3b30;
 }
 
 button.secondary:hover {
     background-color: #c8291f;
+}
+
+.names-section {
+    margin-top: 25px;
+}
+
+.section-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background-color: #f0f2f5;
+    color: #1c1c1e;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.section-toggle:hover {
+    background-color: #e4e7ec;
+}
+
+.toggle-icon {
+    font-size: 13px;
+    color: #6c6c70;
+}
+
+#addNameForm {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#addNameForm input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #dcdce1;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#addNameForm input:focus {
+    outline: none;
+    border-color: #007aff;
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+}
+
+#addNameForm button {
+    width: auto;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+#nameList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#nameList li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border: 1px solid #ececef;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+#nameList li span {
+    color: #1c1c1e;
+    word-break: break-word;
+}
+
+#nameList li button {
+    width: auto;
+    margin-bottom: 0;
+    padding: 6px 12px;
+    font-size: 14px;
 }
