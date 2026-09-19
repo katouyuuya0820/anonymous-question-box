@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>匿名質問箱</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>匿名質問箱</h1>
+        <p>質問を自由に入力してください。</p>
+        <form id="questionForm">
+            <textarea id="questionText" rows="8" placeholder="ここに質問を入力..." required></textarea>
+            <button type="submit">送信</button>
+        </form>
+        <p id="status"></p>
+        <div id="resultArea" hidden>
+            <h2>今読まれている質問</h2>
+            <p id="resultName" class="result-name"></p>
+            <p id="resultQuestion" class="result-question"></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
