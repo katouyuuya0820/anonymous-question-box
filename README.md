@@ -14,16 +14,12 @@
   （変更はメモリ上に保持され、サーバーを再起動すると初期リストに戻ります）。
 - 管理者ページの「参加用QRコードを表示」ボタンで、参加者用ページのURLのQRコードを全画面表示できます
   （オフラインでも動くよう、QR生成ライブラリを同梱しています。画面タップで閉じます）。
-- 表示専用の別アプローチとして、pygameでフルスクリーン表示する `random_question_selector.py` も同梱しています
-  （こちらはサーバーを介さず単体でも動作しますが、サーバーと併用すると結果がスマホ側にも配信されます）。
 
 ## セットアップ
 
 ```bash
 pip install -r requirements.txt
 ```
-
-`random_question_selector.py` を使わない場合、`pygame` は不要です（`websockets` のみで動作します）。
 
 ## 使い方
 
@@ -38,16 +34,6 @@ pip install -r requirements.txt
 3. 管理者は`admin.html`を開き、パスワード（`server.py`の`PASS`）を入力してログインすると、
    「質問開始」でランダムに1件表示、「終了」で表示をクリアできます。
 4. サーバー用PCと参加者のスマホは同じWi-Fi（LAN）に接続している必要があります。
-
-### pygame版（任意）
-
-サーバー用PCで大画面に直接表示したい場合、`server.py`と並行して以下を実行できます。
-
-```bash
-python random_question_selector.py
-```
-
-Enterキーでランダムに次の質問を表示します。
 
 ## 設定
 
