@@ -22,7 +22,7 @@ ADMIN_PORT = 8766    # 管理者用（質問開始・終了）
 STATIC_PORT = 8000   # HTML/JS/CSSを配信するHTTPサーバー用
 
 # 表示に使う名前リスト（自由に編集してください）
-names = ["佐藤", "鈴木", "高橋", "田中", "伊藤", "渡辺", "山本", "中村", "小林", "加藤"]
+names = ["Aさん","Bさん","Cさん"]
 
 # ロギングの設定
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
